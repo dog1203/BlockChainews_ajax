@@ -1,0 +1,69 @@
+/*全局的公共样式---css重置*/
+body            {
+                font-family: "Microsoft yahei";
+                }
+a               {
+                text-decoration: none;
+                color: #333;
+                }
+a:hover         {
+                text-decoration: none;
+                color: #333;
+                }
+h1, h2          { font-family: 'Georgia', serif; margin: 0; }
+h1              { border-bottom: 2px solid #eee; }
+h2              { font-size: 1.2em; }
+ul              {
+                list-style: none;
+                }
+body            {
+                    font-size: 14px;
+                    color: #333;
+                }
+.page           { margin: 2em auto;
+                  padding: 0.8em; background: white; }
+.entries        { list-style: none;
+                  margin: 0;
+                  padding: 0;
+                  font-family:  'Lantinghei SC', 'Open Sans', Arial, 'Hiragino Sans GB', 'Microsoft YaHei', 微软雅黑, STHeiti, 'WenQuanYi Micro Hei', SimSun, sans-serif;
+                  -webkit-font-smoothing: antialiased;
+                  font-size: 18px;
+                  line-height: 1.5;
+                  word-wrap: break-word;
+                }
+.entries li     { width: 32%;
+                  float: left;
+                  overflow: hidden;
+                  position: relative;
+                  border-radius: 4px 4px 4px 4px;
+                  margin-right: 2%;
+                }
+.metanav        { text-align: right; font-size: 0.8em; padding: 0.3em;
+                  margin-bottom: 1em; background: #fafafa; }
+/*去除浮动*/
+.clearfix::before,
+.clearfix::after
+{
+    content: "";
+    clear: both;
+    height: 0;
+    line-height: 0;
+    visibility: hidden;
+    display: block;
+}
+
+.f_l{
+    float: left;
+}
+
+.f_r{
+    float: right;
+}
+
+.m_l{
+    margin-left: 10px;
+}
+
+.m_r{
+    margin-right: 10px;
+}
