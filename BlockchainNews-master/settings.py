@@ -11,7 +11,7 @@ DB_PARAM = {
 
 
 # 新闻抓取频率(分钟)
-CRAWL_INTERVAL = 30
+CRAWL_INTERVAL = 10
 
 
 # TimeZone

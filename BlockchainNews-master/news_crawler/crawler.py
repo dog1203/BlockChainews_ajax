@@ -13,9 +13,6 @@ from bs4 import BeautifulSoup
 from news_crawler.check import check_future, check_blacklist
 from settings import DB_PARAM
 
-
-# from pyquery import PyQuery as pq
-
 client = MongoClient(DB_PARAM['ip'], DB_PARAM['port'],
                      )
 
@@ -94,9 +91,6 @@ def get_image(driver, url):
     return cover_img_url
 
 
-
-
-
 def crawl(url, source, category):
     driver = get_driver()
     try:
@@ -115,26 +109,6 @@ def crawl(url, source, category):
             time.sleep(1)
 
         soup = BeautifulSoup(driver.page_source, 'lxml')
-        # title = soup.select("div.hd > h1")
-        # print(title[0].get_text())
-        # ctime = soup.select("div.a_Info > span.a_time")
-        # print(time[0].string)
-        # author = soup.select("div.qq_articleFt > div.qq_toolWrap > div.qq_editor")
-        # print(author[0].get_text())
-        # paras = soup.select("div.Cnt-Main-Article-QQ > p.text")
-        # for para in paras:
-        #     if len(para) > 0:
-        #         print(para.get_text())
-        #         print()
-        #     # 写入文件
-        #     fo = open("text.txt", "w+")
-        #     fo.writelines(title[0].get_text() + "\n")
-        #     fo.writelines(ctime[0].get_text() + "\n")
-        #     for para in paras:
-        #         if len(para) > 0:
-        #             fo.writelines(para.get_text() + "\n\n")
-        #     fo.writelines(author[0].get_text() + '\n')
-        #     fo.close()
         items = soup.find_all('a')
         for i in items:
             title = i.string
@@ -143,30 +117,71 @@ def crawl(url, source, category):
             else:
                 continue
             news_url = i.get('href')
+            #print(news_url)
+            content = ''
+
+            is_exist = db.news.find_one({'title': title})
 
             if title and check_future(title) and check_blacklist(title):
                 print(title)
-                # print(news_url)
+                print(news_url)
                 img_url = get_image(driver, news_url)
+                if not is_exist:
+                    content = getContent(news_url)
 
                 data = {
                     'title': title,
-                     'url': news_url,
-                    # 'content': content,
-                    # 'time': ctime[0].get_text(),
-                    # 'Paragraph': paras,
-                    # 'Author': author[0].get_text(),
+                    'url': news_url,
                     'source': source,
                     'category': category,
                     'img_url': img_url,
+                    'content': content,
                     'crawled_at': datetime.datetime.utcnow(),
                 }
-                print(data)
-                is_exist = db.news.find_one({'title': title})
-                if not is_exist:
-                    db.news.insert(data)
+
+                #is_exist = db.news.find_one({'title': title})
+                if data['content'] != '':
+                #if not is_exist:
+                        print(data['title'])
+                        db.news.insert(data)
 
     except Exception as e:
         print(str(e))
     driver.quit()
 
+
+def getHTMLText(url):
+    try:
+        r = requests.get(url, timeout = 30)
+        r.raise_for_status()
+        #r.encoding = 'utf-8'
+        return r.text
+    except:
+        return ""
+
+def getContent(url):
+
+    html = getHTMLText(url)
+    # print(html)
+    soup = BeautifulSoup(html, "html.parser")
+
+    paras = soup.find_all('p')
+    #print(type(paras))
+
+
+
+    content = ''
+    for para in paras:
+        if len(para.get_text()) > 0:
+            #print(type(para.get_text()))
+            content += para.get_text() + "\n"
+    # for p in paras2:
+    #     if len(p) > 0:
+    #         #print(type(para.get_text()))
+    #         content += para.get_text() + "\n\n"
+
+    print(content)
+
+    return content
+
+#getContent('http://www.sohu.com/a/243459999_561670')

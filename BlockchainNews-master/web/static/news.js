@@ -1,7 +1,9 @@
-var timeString = function(timestamp) {
-    t = new Date(timestamp * 1000)
-    t = t.toLocaleTimeString()
-    return t
+var log = function() {
+    console.log.apply(console, arguments)
+}
+
+var e = function(sel) {
+    return document.querySelector(sel)
 }
 
 var newsTemplate = function(data) {
@@ -18,11 +20,12 @@ var newsTemplate = function(data) {
     // 在这个例子里面, 是 d.dataset.id
     var n = `<li class="news-cell" style="margin-top: 10px;">
         <p>
-            <a href="{{url}}" target="_blank" style="text-decoration: none;"> {{title}}</a>
+            <a href="${url}" target="_blank" style="text-decoration: none;"> ${title}</a>
 
-            <em style="font-size: 12px; color: #666;">[{{source }} {{category} } {{created_at}}]</em>
+            <em style="font-size: 12px; color: #666;">[${source } ${category} ${created_at}]</em>
         </p>
     </li>
+
 
     `
     return n
@@ -37,22 +40,43 @@ var insertNews = function(data) {
     newsList.insertAdjacentHTML('beforeend', newsCell)
 }
 
+var ajax = function(method, path,  data, reseponseCallback) {
+    var r = new XMLHttpRequest()
+    // 设置请求方法和请求地址
+    r.open(method, path, true)
+    // 设置发送的数据的格式
+    r.setRequestHeader('Content-Type', 'application/json')
+    // 注册响应函数
+    r.onreadystatechange = function() {
+        if(r.readyState === 4) {
+            reseponseCallback(r.response)
+        }
+    }
+    // 发送请求
+    r.send(data)
+}
 
 var loadNews = function() {
     // 调用 ajax api 来载入数据
-    apiAll(function(r) {
-        console.log('load all', r)
+    apiAll(function(res) {
+
         // 解析为 数组
-        var news = JSON.parse(r)
+        var news = JSON.parse(res)
+
+        console.log('load all', news)
 
         // 循环添加到页面中
         for(var i = 0; i < news.length; i++) {
-            var new = news[i]
-            insertNews(new)
+            var nw = news[i]
+            insertNews(nw)
         }
     })
 }
 
+var apiAll = function(callback) {
+    var path = '/api/v1/news'
+    ajax('GET', path, '', callback)
+}
 
 
 

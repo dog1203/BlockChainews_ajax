@@ -18,20 +18,8 @@ from flask import Flask, jsonify
 from web.utils import get_db
 from web.utils import datetime_format
 
-# from news_crawler.main import start
-# from settings import CRAWL_INTERVAL
-# import time
-from web.utils import (
-    log,
-    datetime_format,
-    template,
-    http_response,
-)
-
-
 
 app = Flask(__name__)
-
 app.config.from_object('settings')
 db = get_db()
 
@@ -55,10 +43,10 @@ def get_news():
             'id': str(n['_id']),
             'title': n['title'],
             'url': n['url'],
-            # 'Paragraph': n['Paragraph'],
             'image': n['img_url'],
             'category': n['category'],
             'source': n['source'],
+            'content': n['content'],
             'created_at': datetime_format(n['crawled_at']),
         }
 
@@ -69,35 +57,33 @@ def get_news():
 
 @app.route('/')
 def index():
-    # page = int(request.args.get('page', 0))
-    # limit = int(request.args.get('limit', 100))
-    #
-    # news = db.news.find().sort("crawled_at", -1).skip(page * limit).limit(limit)
+    page = int(request.args.get('page', 0))
+    limit = int(request.args.get('limit', 100))
+
+    news = db.news.find().sort("crawled_at", -1).skip(page * limit).limit(limit)
 
     # import json
     # from bson import json_util
     # docs_list = list(news)
     # return json.dumps(docs_list, default=json_util.default)
 
-    # entries = []
-    # for n in news:
-    #     item = {
-    #         'id': str(n['_id']),
-    #         'title': n['title'],
-    #         'url': n['url'],
-    #         # 'Paragraph': n['Paragraph'],
-    #         'image': n['img_url'],
-    #         'category': n['category'],
-    #         'source': n['source'],
-    #         'created_at': datetime_format(n['crawled_at']),
-    #     }
-    #
-    #     entries.append(item)
-    #     # random.shuffle(entries)
+    entries = []
+    for n in news:
+        item = {
+            'id': str(n['_id']),
+            'title': n['title'],
+            'url': n['url'],
+            'image': n['img_url'],
+            'category': n['category'],
+            'source': n['source'],
+            'content': n['content'],
+            'created_at': datetime_format(n['crawled_at']),
+        }
 
-     return render_template('show_entries.html')
+        entries.append(item)
+        # random.shuffle(entries)
 
-
+    return render_template('index.html', entries=entries)
 
 
 
@@ -105,8 +91,4 @@ def index():
 
 
 if __name__ == '__main__':
-    # start()
-    # time.sleep(60 * CRAWL_INTERVAL)
-    app.run(host='0.0.0.0', port=3009, debug=True)
-
-
+    app.run(host='0.0.0.0', port=8080, debug=True)
